@@ -1,0 +1,621 @@
+{
+  "name": "ECS — Sistema Completo (Salvar + Painel)",
+  "nodes": [
+
+    {
+      "parameters": {
+        "httpMethod": "OPTIONS",
+        "path": "ecs-matricula",
+        "responseMode": "responseNode",
+        "options": { "allowedOrigins": "*" }
+      },
+      "id": "cors-1", "name": "CORS Matrícula",
+      "type": "n8n-nodes-base.webhook", "typeVersion": 2,
+      "position": [0, -200]
+    },
+    {
+      "parameters": { "respondWith": "json", "responseBody": "={}",
+        "options": { "responseCode": 204, "responseHeaders": { "entries": [
+          {"name":"Access-Control-Allow-Origin","value":"*"},
+          {"name":"Access-Control-Allow-Methods","value":"GET,POST,OPTIONS"},
+          {"name":"Access-Control-Allow-Headers","value":"Content-Type,Authorization,apikey"}
+        ]}}},
+      "id": "cors-resp-1", "name": "CORS Resp Matrícula",
+      "type": "n8n-nodes-base.respondToWebhook", "typeVersion": 1,
+      "position": [240, -200]
+    },
+
+    {
+      "parameters": {
+        "httpMethod": "OPTIONS",
+        "path": "ecs-painel",
+        "responseMode": "responseNode",
+        "options": { "allowedOrigins": "*" }
+      },
+      "id": "cors-2", "name": "CORS Painel",
+      "type": "n8n-nodes-base.webhook", "typeVersion": 2,
+      "position": [0, -80]
+    },
+    {
+      "parameters": { "respondWith": "json", "responseBody": "={}",
+        "options": { "responseCode": 204, "responseHeaders": { "entries": [
+          {"name":"Access-Control-Allow-Origin","value":"*"},
+          {"name":"Access-Control-Allow-Methods","value":"GET,POST,OPTIONS"},
+          {"name":"Access-Control-Allow-Headers","value":"Content-Type,Authorization,apikey"}
+        ]}}},
+      "id": "cors-resp-2", "name": "CORS Resp Painel",
+      "type": "n8n-nodes-base.respondToWebhook", "typeVersion": 1,
+      "position": [240, -80]
+    },
+
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ecs-matricula",
+        "responseMode": "responseNode",
+        "options": { "allowedOrigins": "*" }
+      },
+      "id": "wh-mat", "name": "WH POST Matrícula",
+      "type": "n8n-nodes-base.webhook", "typeVersion": 2,
+      "position": [0, 100]
+    },
+    {
+      "parameters": {
+        "jsCode": "const b = $input.first().json.body || $input.first().json;\nconst precos = {mensal:129.90,trimestral:99.90,anual:79.90};\nlet valor = precos[b.plano] || 129.90;\nif(b.desconto>0) valor = valor*(1-b.desconto/100);\nreturn [{json:{\n  nome:      b.nome||'',\n  email:     b.email||'',\n  telefone:  b.tel||b.telefone||'',\n  cidade:    b.cidade||'',\n  estado:    b.estado||'',\n  nivel_exp: b.nivel||'iniciante',\n  trilha:    b.trilha,\n  plano:     b.plano,\n  valor:     Math.round(valor*100)/100,\n  desconto:  b.desconto||0,\n  cupom:     b.cupom||null,\n  id_local:  b.id_local||('ECS-'+Date.now())\n}}];"
+      },
+      "id": "parse-mat", "name": "Parse Matrícula",
+      "type": "n8n-nodes-base.code", "typeVersion": 2,
+      "position": [240, 100]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://vfxocmjcumjhrnahyoep.supabase.co/rest/v1/usuarios",
+        "sendHeaders": true,
+        "headerParameters": {"parameters": [
+          {"name":"apikey","value":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"},
+          {"name":"Authorization","value":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"},
+          {"name":"Content-Type","value":"application/json"},
+          {"name":"Prefer","value":"return=representation,resolution=merge-duplicates"}
+        ]},
+        "sendBody": true, "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({nome:$json.nome,email:$json.email,telefone:$json.telefone,cidade:$json.cidade,estado:$json.estado,nivel_exp:$json.nivel_exp,role:'aluno',ativo:true}) }}"
+      },
+      "id": "sb-upsert-usr", "name": "SB Upsert Usuário",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4,
+      "position": [480, 100]
+    },
+    {
+      "parameters": {
+        "jsCode": "const usr = $input.first().json;\nconst prev = $('Parse Matrícula').first().json;\nconst userId = Array.isArray(usr)&&usr[0]?usr[0].id:usr.id||null;\nreturn [{json:{...prev,usuario_id:userId}}];"
+      },
+      "id": "get-uid", "name": "Extrair ID Usuário",
+      "type": "n8n-nodes-base.code", "typeVersion": 2,
+      "position": [720, 100]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://vfxocmjcumjhrnahyoep.supabase.co/rest/v1/matriculas",
+        "sendHeaders": true,
+        "headerParameters": {"parameters": [
+          {"name":"apikey","value":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"},
+          {"name":"Authorization","value":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"},
+          {"name":"Content-Type","value":"application/json"},
+          {"name":"Prefer","value":"return=representation,resolution=ignore-duplicates"}
+        ]},
+        "sendBody": true, "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({usuario_id:$json.usuario_id,trilha:$json.trilha,plano:$json.plano,status:'pendente',valor:$json.valor,desconto:$json.desconto,cupom:$json.cupom,id_local:$json.id_local}) }}"
+      },
+      "id": "sb-ins-mat", "name": "SB Insert Matrícula",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4,
+      "position": [960, 100]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://vfxocmjcumjhrnahyoep.supabase.co/rest/v1/logs_sistema",
+        "sendHeaders": true,
+        "headerParameters": {"parameters": [
+          {"name":"apikey","value":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"},
+          {"name":"Authorization","value":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"},
+          {"name":"Content-Type","value":"application/json"}
+        ]},
+        "sendBody": true, "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({usuario_id:$('Extrair ID Usuário').first().json.usuario_id,acao:'matricula_criada',detalhes:{trilha:$('Extrair ID Usuário').first().json.trilha,plano:$('Extrair ID Usuário').first().json.plano,id_local:$('Extrair ID Usuário').first().json.id_local,valor:$('Extrair ID Usuário').first().json.valor}}) }}"
+      },
+      "id": "sb-log-mat", "name": "SB Log Matrícula",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4,
+      "position": [1200, 100]
+    },
+    {
+      "parameters": { "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({success:true,message:'Matrícula salva!',id_local:$('Extrair ID Usuário').first().json.id_local}) }}",
+        "options": {"responseHeaders":{"entries":[{"name":"Access-Control-Allow-Origin","value":"*"}]}}
+      },
+      "id": "resp-mat", "name": "Resp Matrícula",
+      "type": "n8n-nodes-base.respondToWebhook", "typeVersion": 1,
+      "position": [1440, 100]
+    },
+
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ecs-matricula-aprovada",
+        "responseMode": "responseNode",
+        "options": { "allowedOrigins": "*" }
+      },
+      "id": "wh-aprov", "name": "WH Aprovar Matrícula",
+      "type": "n8n-nodes-base.webhook", "typeVersion": 2,
+      "position": [0, 280]
+    },
+    {
+      "parameters": {
+        "jsCode": "const b=$input.first().json.body||$input.first().json;\nreturn [{json:{id_local:b.id_local||b.id,aprovado_por:b.aprovado_por||null,ts:b.ts||new Date().toISOString()}}];"
+      },
+      "id": "parse-aprov", "name": "Parse Aprovação",
+      "type": "n8n-nodes-base.code", "typeVersion": 2,
+      "position": [240, 280]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://vfxocmjcumjhrnahyoep.supabase.co/rest/v1/matriculas?id_local=eq.{{ $json.id_local }}",
+        "sendHeaders": true,
+        "headerParameters": {"parameters": [
+          {"name":"apikey","value":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"},
+          {"name":"Authorization","value":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"},
+          {"name":"Content-Type","value":"application/json"},
+          {"name":"Prefer","value":"return=representation"}
+        ]},
+        "sendBody": true, "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({status:'aprovada',aprovado_em:$json.ts}) }}"
+      },
+      "id": "sb-aprov", "name": "SB Aprovar Matrícula",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4,
+      "position": [480, 280]
+    },
+    {
+      "parameters": { "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({success:true,message:'Matrícula aprovada!'}) }}",
+        "options": {"responseHeaders":{"entries":[{"name":"Access-Control-Allow-Origin","value":"*"}]}}
+      },
+      "id": "resp-aprov", "name": "Resp Aprovação",
+      "type": "n8n-nodes-base.respondToWebhook", "typeVersion": 1,
+      "position": [720, 280]
+    },
+
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ecs-aluno",
+        "responseMode": "responseNode",
+        "options": { "allowedOrigins": "*" }
+      },
+      "id": "wh-aluno", "name": "WH Salvar Aluno",
+      "type": "n8n-nodes-base.webhook", "typeVersion": 2,
+      "position": [0, 440]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://vfxocmjcumjhrnahyoep.supabase.co/rest/v1/usuarios",
+        "sendHeaders": true,
+        "headerParameters": {"parameters": [
+          {"name":"apikey","value":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"},
+          {"name":"Authorization","value":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"},
+          {"name":"Content-Type","value":"application/json"},
+          {"name":"Prefer","value":"return=representation,resolution=merge-duplicates"}
+        ]},
+        "sendBody": true, "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({nome:$json.body.nome||$json.nome,email:$json.body.email||$json.email,role:'aluno',ativo:true}) }}"
+      },
+      "id": "sb-aluno", "name": "SB Insert Aluno",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4,
+      "position": [240, 440]
+    },
+    {
+      "parameters": { "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({success:true,message:'Aluno salvo!'}) }}",
+        "options": {"responseHeaders":{"entries":[{"name":"Access-Control-Allow-Origin","value":"*"}]}}
+      },
+      "id": "resp-aluno", "name": "Resp Aluno",
+      "type": "n8n-nodes-base.respondToWebhook", "typeVersion": 1,
+      "position": [480, 440]
+    },
+
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ecs-aprender",
+        "responseMode": "responseNode",
+        "options": { "allowedOrigins": "*" }
+      },
+      "id": "wh-kb", "name": "WH Base Conhecimento",
+      "type": "n8n-nodes-base.webhook", "typeVersion": 2,
+      "position": [0, 580]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://vfxocmjcumjhrnahyoep.supabase.co/rest/v1/base_conhecimento",
+        "sendHeaders": true,
+        "headerParameters": {"parameters": [
+          {"name":"apikey","value":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"},
+          {"name":"Authorization","value":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"},
+          {"name":"Content-Type","value":"application/json"},
+          {"name":"Prefer","value":"return=representation"}
+        ]},
+        "sendBody": true, "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({problema:$json.body.problema||$json.problema,solucao:$json.body.solucao||$json.solucao,categoria:$json.body.categoria||$json.categoria||'outro',aprovado:false}) }}"
+      },
+      "id": "sb-kb", "name": "SB Insert KB",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4,
+      "position": [240, 580]
+    },
+    {
+      "parameters": { "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({success:true,message:'Conhecimento registrado!'}) }}",
+        "options": {"responseHeaders":{"entries":[{"name":"Access-Control-Allow-Origin","value":"*"}]}}
+      },
+      "id": "resp-kb", "name": "Resp KB",
+      "type": "n8n-nodes-base.respondToWebhook", "typeVersion": 1,
+      "position": [480, 580]
+    },
+
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ecs-chamado",
+        "responseMode": "responseNode",
+        "options": { "allowedOrigins": "*" }
+      },
+      "id": "wh-cham", "name": "WH Chamado",
+      "type": "n8n-nodes-base.webhook", "typeVersion": 2,
+      "position": [0, 720]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://vfxocmjcumjhrnahyoep.supabase.co/rest/v1/chamados",
+        "sendHeaders": true,
+        "headerParameters": {"parameters": [
+          {"name":"apikey","value":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"},
+          {"name":"Authorization","value":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"},
+          {"name":"Content-Type","value":"application/json"},
+          {"name":"Prefer","value":"return=representation"}
+        ]},
+        "sendBody": true, "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({assunto:$json.body.assunto||$json.assunto,descricao:$json.body.descricao||$json.descricao||'',prioridade:$json.body.prioridade||$json.prioridade||'media',status:'aberto'}) }}"
+      },
+      "id": "sb-cham", "name": "SB Insert Chamado",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4,
+      "position": [240, 720]
+    },
+    {
+      "parameters": { "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({success:true,message:'Chamado aberto!'}) }}",
+        "options": {"responseHeaders":{"entries":[{"name":"Access-Control-Allow-Origin","value":"*"}]}}
+      },
+      "id": "resp-cham", "name": "Resp Chamado",
+      "type": "n8n-nodes-base.respondToWebhook", "typeVersion": 1,
+      "position": [480, 720]
+    },
+
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ecs-progresso",
+        "responseMode": "responseNode",
+        "options": { "allowedOrigins": "*" }
+      },
+      "id": "wh-prog", "name": "WH Progresso",
+      "type": "n8n-nodes-base.webhook", "typeVersion": 2,
+      "position": [0, 860]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://vfxocmjcumjhrnahyoep.supabase.co/rest/v1/progresso_aluno",
+        "sendHeaders": true,
+        "headerParameters": {"parameters": [
+          {"name":"apikey","value":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"},
+          {"name":"Authorization","value":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"},
+          {"name":"Content-Type","value":"application/json"},
+          {"name":"Prefer","value":"return=representation,resolution=merge-duplicates"}
+        ]},
+        "sendBody": true, "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({usuario_id:$json.body.usuario_id||$json.usuario_id,aula_id:$json.body.aula_id||$json.aula_id,curso_id:$json.body.curso_id||$json.curso_id,status:'concluida',xp_ganho:$json.body.xp||$json.xp||10,concluido_em:new Date().toISOString()}) }}"
+      },
+      "id": "sb-prog", "name": "SB Insert Progresso",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4,
+      "position": [240, 860]
+    },
+    {
+      "parameters": { "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({success:true,message:'Progresso salvo!'}) }}",
+        "options": {"responseHeaders":{"entries":[{"name":"Access-Control-Allow-Origin","value":"*"}]}}
+      },
+      "id": "resp-prog", "name": "Resp Progresso",
+      "type": "n8n-nodes-base.respondToWebhook", "typeVersion": 1,
+      "position": [480, 860]
+    },
+
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "ecs-painel",
+        "responseMode": "responseNode",
+        "options": { "allowedOrigins": "*" }
+      },
+      "id": "wh-painel", "name": "WH GET Painel",
+      "type": "n8n-nodes-base.webhook", "typeVersion": 2,
+      "position": [0, 1060]
+    },
+    {
+      "parameters": {
+        "jsCode": "const q=$input.first().json.query||{};\nreturn [{json:{tipo:(q.tipo||'matriculas').toLowerCase()}}];"
+      },
+      "id": "parse-tipo", "name": "Detectar Tipo",
+      "type": "n8n-nodes-base.code", "typeVersion": 2,
+      "position": [240, 1060]
+    },
+    {
+      "parameters": {
+        "rules": { "values": [
+          {"conditions":{"options":{"caseSensitive":false},"conditions":[{"leftValue":"={{ $json.tipo }}","rightValue":"matriculas","operator":{"type":"string","operation":"equals"}}]},"renameOutput":true,"outputKey":"matriculas"},
+          {"conditions":{"options":{"caseSensitive":false},"conditions":[{"leftValue":"={{ $json.tipo }}","rightValue":"alunos","operator":{"type":"string","operation":"equals"}}]},"renameOutput":true,"outputKey":"alunos"},
+          {"conditions":{"options":{"caseSensitive":false},"conditions":[{"leftValue":"={{ $json.tipo }}","rightValue":"professores","operator":{"type":"string","operation":"equals"}}]},"renameOutput":true,"outputKey":"professores"},
+          {"conditions":{"options":{"caseSensitive":false},"conditions":[{"leftValue":"={{ $json.tipo }}","rightValue":"chamados","operator":{"type":"string","operation":"equals"}}]},"renameOutput":true,"outputKey":"chamados"},
+          {"conditions":{"options":{"caseSensitive":false},"conditions":[{"leftValue":"={{ $json.tipo }}","rightValue":"logs","operator":{"type":"string","operation":"equals"}}]},"renameOutput":true,"outputKey":"logs"},
+          {"conditions":{"options":{"caseSensitive":false},"conditions":[{"leftValue":"={{ $json.tipo }}","rightValue":"financeiro","operator":{"type":"string","operation":"equals"}}]},"renameOutput":true,"outputKey":"financeiro"},
+          {"conditions":{"options":{"caseSensitive":false},"conditions":[{"leftValue":"={{ $json.tipo }}","rightValue":"kb","operator":{"type":"string","operation":"equals"}}]},"renameOutput":true,"outputKey":"kb"}
+        ]},
+        "fallbackOutput": "extra"
+      },
+      "id": "switch", "name": "Switch Tipo",
+      "type": "n8n-nodes-base.switch", "typeVersion": 3,
+      "position": [480, 1060]
+    },
+
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://vfxocmjcumjhrnahyoep.supabase.co/rest/v1/matriculas?select=*,usuarios(nome,email,telefone,cidade,estado)&order=created_at.desc&limit=200",
+        "sendHeaders": true,
+        "headerParameters": {"parameters": [
+          {"name":"apikey","value":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"},
+          {"name":"Authorization","value":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"}
+        ]}
+      },
+      "id": "get-mats", "name": "GET Matrículas",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4,
+      "position": [720, 940]
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw=Array.isArray($input.first().json)?$input.first().json:[$input.first().json];\nconst data=raw.map(m=>({id:m.id_local||m.id,id_supabase:m.id,aluno:m.usuarios?m.usuarios.nome:'—',nome:m.usuarios?m.usuarios.nome:'—',email:m.usuarios?m.usuarios.email:'—',telefone:m.usuarios?m.usuarios.telefone:'—',trilha:m.trilha,plano:m.plano,valor:m.valor,desconto:m.desconto||0,cupom:m.cupom||'',status:m.status,data:(m.created_at||'').slice(0,10),created_at:m.created_at}));\nreturn [{json:{success:true,tipo:'matriculas',total:data.length,data}}];"
+      },
+      "id": "fmt-mats", "name": "Fmt Matrículas",
+      "type": "n8n-nodes-base.code", "typeVersion": 2,
+      "position": [960, 940]
+    },
+
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://vfxocmjcumjhrnahyoep.supabase.co/rest/v1/usuarios?select=*&role=eq.aluno&order=created_at.desc&limit=200",
+        "sendHeaders": true,
+        "headerParameters": {"parameters": [
+          {"name":"apikey","value":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"},
+          {"name":"Authorization","value":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"}
+        ]}
+      },
+      "id": "get-alunos", "name": "GET Alunos",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4,
+      "position": [720, 1060]
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw=Array.isArray($input.first().json)?$input.first().json:[$input.first().json];\nconst data=raw.map(u=>({id:u.id,nome:u.nome,email:u.email,telefone:u.telefone||'',cidade:u.cidade||'',estado:u.estado||'',nivel:u.nivel_exp||'iniciante',turma:'blue_team',prog:0,status:u.ativo?'ativo':'inativo',last:u.ultimo_login?(u.ultimo_login||'').slice(0,16).replace('T',' '):'—',nota:0,created_at:u.created_at}));\nreturn [{json:{success:true,tipo:'alunos',total:data.length,data}}];"
+      },
+      "id": "fmt-alunos", "name": "Fmt Alunos",
+      "type": "n8n-nodes-base.code", "typeVersion": 2,
+      "position": [960, 1060]
+    },
+
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://vfxocmjcumjhrnahyoep.supabase.co/rest/v1/usuarios?select=*&role=eq.professor&order=nome.asc",
+        "sendHeaders": true,
+        "headerParameters": {"parameters": [
+          {"name":"apikey","value":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"},
+          {"name":"Authorization","value":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"}
+        ]}
+      },
+      "id": "get-profs", "name": "GET Professores",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4,
+      "position": [720, 1180]
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw=Array.isArray($input.first().json)?$input.first().json:[$input.first().json];\nconst data=raw.map(u=>({id:u.id,nome:u.nome,email:u.email,disc:'Cibersegurança',turmas:0,alunos:0,nota:4.8,status:u.ativo?'ativo':'inativo',created_at:u.created_at}));\nreturn [{json:{success:true,tipo:'professores',total:data.length,data}}];"
+      },
+      "id": "fmt-profs", "name": "Fmt Professores",
+      "type": "n8n-nodes-base.code", "typeVersion": 2,
+      "position": [960, 1180]
+    },
+
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://vfxocmjcumjhrnahyoep.supabase.co/rest/v1/chamados?select=*,usuarios!autor_id(nome,email)&order=created_at.desc&limit=100",
+        "sendHeaders": true,
+        "headerParameters": {"parameters": [
+          {"name":"apikey","value":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"},
+          {"name":"Authorization","value":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"}
+        ]}
+      },
+      "id": "get-chams", "name": "GET Chamados",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4,
+      "position": [720, 1300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw=Array.isArray($input.first().json)?$input.first().json:[$input.first().json];\nconst data=raw.map(c=>({id:c.id,id_chamado:'#'+c.id.slice(-4),aluno:c.usuarios?c.usuarios.nome:'—',email:c.usuarios?c.usuarios.email:'—',assunto:c.assunto,descricao:c.descricao||'',prio:c.prioridade||'media',status:c.status,data:(c.created_at||'').slice(0,10),created_at:c.created_at}));\nreturn [{json:{success:true,tipo:'chamados',total:data.length,data}}];"
+      },
+      "id": "fmt-chams", "name": "Fmt Chamados",
+      "type": "n8n-nodes-base.code", "typeVersion": 2,
+      "position": [960, 1300]
+    },
+
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://vfxocmjcumjhrnahyoep.supabase.co/rest/v1/logs_sistema?select=*,usuarios(nome)&order=created_at.desc&limit=50",
+        "sendHeaders": true,
+        "headerParameters": {"parameters": [
+          {"name":"apikey","value":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"},
+          {"name":"Authorization","value":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"}
+        ]}
+      },
+      "id": "get-logs", "name": "GET Logs",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4,
+      "position": [720, 1420]
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw=Array.isArray($input.first().json)?$input.first().json:[$input.first().json];\nconst data=raw.map(l=>({id:l.id,acao:l.acao,usuario_nome:l.usuarios?l.usuarios.nome:'—',detalhes:l.detalhes,created_at:l.created_at}));\nreturn [{json:{success:true,tipo:'logs',total:data.length,data}}];"
+      },
+      "id": "fmt-logs", "name": "Fmt Logs",
+      "type": "n8n-nodes-base.code", "typeVersion": 2,
+      "position": [960, 1420]
+    },
+
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://vfxocmjcumjhrnahyoep.supabase.co/rest/v1/financeiro?select=*,usuarios(nome,email)&order=created_at.desc&limit=100",
+        "sendHeaders": true,
+        "headerParameters": {"parameters": [
+          {"name":"apikey","value":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"},
+          {"name":"Authorization","value":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"}
+        ]}
+      },
+      "id": "get-fin", "name": "GET Financeiro",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4,
+      "position": [720, 1540]
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw=Array.isArray($input.first().json)?$input.first().json:[$input.first().json];\nconst data=raw.map(f=>({id:f.id,aluno:f.usuarios?f.usuarios.nome:'—',email:f.usuarios?f.usuarios.email:'—',plano:f.descricao||'Mensalidade',valor:'R$'+(f.valor||0).toFixed(2).replace('.',','),venc:(f.vencimento||'').slice(0,10),status:f.status,created_at:f.created_at}));\nreturn [{json:{success:true,tipo:'financeiro',total:data.length,data}}];"
+      },
+      "id": "fmt-fin", "name": "Fmt Financeiro",
+      "type": "n8n-nodes-base.code", "typeVersion": 2,
+      "position": [960, 1540]
+    },
+
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://vfxocmjcumjhrnahyoep.supabase.co/rest/v1/base_conhecimento?select=*&order=created_at.desc&limit=100",
+        "sendHeaders": true,
+        "headerParameters": {"parameters": [
+          {"name":"apikey","value":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"},
+          {"name":"Authorization","value":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"}
+        ]}
+      },
+      "id": "get-kb", "name": "GET KB",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4,
+      "position": [720, 1660]
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw=Array.isArray($input.first().json)?$input.first().json:[$input.first().json];\nconst data=raw.map(k=>({id:k.id,prob:k.problema,solucao:k.solucao,cat:k.categoria,status:k.aprovado?'resolvido':'em aberto',created_at:k.created_at}));\nreturn [{json:{success:true,tipo:'kb',total:data.length,data}}];"
+      },
+      "id": "fmt-kb", "name": "Fmt KB",
+      "type": "n8n-nodes-base.code", "typeVersion": 2,
+      "position": [960, 1660]
+    },
+
+    {
+      "parameters": {
+        "jsCode": "const tipo=$('Detectar Tipo').first().json.tipo;\nreturn [{json:{success:false,tipo:tipo,total:0,data:[],erro:'Tipo inválido. Use: matriculas, alunos, professores, chamados, logs, financeiro, kb'}}];"
+      },
+      "id": "fallback", "name": "Fallback",
+      "type": "n8n-nodes-base.code", "typeVersion": 2,
+      "position": [720, 1760]
+    },
+
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {"responseHeaders":{"entries":[
+          {"name":"Access-Control-Allow-Origin","value":"*"},
+          {"name":"Access-Control-Allow-Methods","value":"GET,POST,OPTIONS"},
+          {"name":"Access-Control-Allow-Headers","value":"Content-Type,Authorization,apikey"}
+        ]}}
+      },
+      "id": "resp-painel", "name": "Resp Painel (CORS)",
+      "type": "n8n-nodes-base.respondToWebhook", "typeVersion": 1,
+      "position": [1200, 1300]
+    }
+
+  ],
+
+  "connections": {
+    "CORS Matrícula":      {"main":[[{"node":"CORS Resp Matrícula","type":"main","index":0}]]},
+    "CORS Painel":         {"main":[[{"node":"CORS Resp Painel","type":"main","index":0}]]},
+    "WH POST Matrícula":   {"main":[[{"node":"Parse Matrícula","type":"main","index":0}]]},
+    "Parse Matrícula":     {"main":[[{"node":"SB Upsert Usuário","type":"main","index":0}]]},
+    "SB Upsert Usuário":   {"main":[[{"node":"Extrair ID Usuário","type":"main","index":0}]]},
+    "Extrair ID Usuário":  {"main":[[{"node":"SB Insert Matrícula","type":"main","index":0}]]},
+    "SB Insert Matrícula": {"main":[[{"node":"SB Log Matrícula","type":"main","index":0}]]},
+    "SB Log Matrícula":    {"main":[[{"node":"Resp Matrícula","type":"main","index":0}]]},
+    "WH Aprovar Matrícula":{"main":[[{"node":"Parse Aprovação","type":"main","index":0}]]},
+    "Parse Aprovação":     {"main":[[{"node":"SB Aprovar Matrícula","type":"main","index":0}]]},
+    "SB Aprovar Matrícula":{"main":[[{"node":"Resp Aprovação","type":"main","index":0}]]},
+    "WH Salvar Aluno":     {"main":[[{"node":"SB Insert Aluno","type":"main","index":0}]]},
+    "SB Insert Aluno":     {"main":[[{"node":"Resp Aluno","type":"main","index":0}]]},
+    "WH Base Conhecimento":{"main":[[{"node":"SB Insert KB","type":"main","index":0}]]},
+    "SB Insert KB":        {"main":[[{"node":"Resp KB","type":"main","index":0}]]},
+    "WH Chamado":          {"main":[[{"node":"SB Insert Chamado","type":"main","index":0}]]},
+    "SB Insert Chamado":   {"main":[[{"node":"Resp Chamado","type":"main","index":0}]]},
+    "WH Progresso":        {"main":[[{"node":"SB Insert Progresso","type":"main","index":0}]]},
+    "SB Insert Progresso": {"main":[[{"node":"Resp Progresso","type":"main","index":0}]]},
+    "WH GET Painel":       {"main":[[{"node":"Detectar Tipo","type":"main","index":0}]]},
+    "Detectar Tipo":       {"main":[[{"node":"Switch Tipo","type":"main","index":0}]]},
+    "Switch Tipo": {"main":[
+      [{"node":"GET Matrículas","type":"main","index":0}],
+      [{"node":"GET Alunos","type":"main","index":0}],
+      [{"node":"GET Professores","type":"main","index":0}],
+      [{"node":"GET Chamados","type":"main","index":0}],
+      [{"node":"GET Logs","type":"main","index":0}],
+      [{"node":"GET Financeiro","type":"main","index":0}],
+      [{"node":"GET KB","type":"main","index":0}],
+      [{"node":"Fallback","type":"main","index":0}]
+    ]},
+    "GET Matrículas":  {"main":[[{"node":"Fmt Matrículas","type":"main","index":0}]]},
+    "GET Alunos":      {"main":[[{"node":"Fmt Alunos","type":"main","index":0}]]},
+    "GET Professores": {"main":[[{"node":"Fmt Professores","type":"main","index":0}]]},
+    "GET Chamados":    {"main":[[{"node":"Fmt Chamados","type":"main","index":0}]]},
+    "GET Logs":        {"main":[[{"node":"Fmt Logs","type":"main","index":0}]]},
+    "GET Financeiro":  {"main":[[{"node":"Fmt Financeiro","type":"main","index":0}]]},
+    "GET KB":          {"main":[[{"node":"Fmt KB","type":"main","index":0}]]},
+    "Fmt Matrículas":  {"main":[[{"node":"Resp Painel (CORS)","type":"main","index":0}]]},
+    "Fmt Alunos":      {"main":[[{"node":"Resp Painel (CORS)","type":"main","index":0}]]},
+    "Fmt Professores": {"main":[[{"node":"Resp Painel (CORS)","type":"main","index":0}]]},
+    "Fmt Chamados":    {"main":[[{"node":"Resp Painel (CORS)","type":"main","index":0}]]},
+    "Fmt Logs":        {"main":[[{"node":"Resp Painel (CORS)","type":"main","index":0}]]},
+    "Fmt Financeiro":  {"main":[[{"node":"Resp Painel (CORS)","type":"main","index":0}]]},
+    "Fmt KB":          {"main":[[{"node":"Resp Painel (CORS)","type":"main","index":0}]]},
+    "Fallback":        {"main":[[{"node":"Resp Painel (CORS)","type":"main","index":0}]]}
+  },
+
+  "active": true,
+  "settings": {"executionOrder":"v1","saveManualExecutions":true},
+  "tags": [],
+  "pinData": {}
+}

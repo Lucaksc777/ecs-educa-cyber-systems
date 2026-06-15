@@ -1,0 +1,82 @@
+<!-- ═══ ECS — Página: PAINEL-PROFESSOR ═══ -->
+
+<div id="p-painel-professor" class="page portal">
+  <div class="portal-shell">
+    <aside class="sb">
+      <div class="sb-top"><div class="sb-logo"><div class="sb-lbox" style="background:linear-gradient(135deg,var(--pu),var(--bl))">🛡</div><div><div class="sb-brand">ECS</div><div class="sb-role sbr-pr">PROFESSOR</div></div></div></div>
+      <div class="sb-user">
+        <div class="sb-av" id="pr-av" style="background:linear-gradient(135deg,var(--pu),var(--bl));color:#fff">PR</div>
+        <div style="flex:1;min-width:0"><div class="sb-uname" id="pr-name">Prof. Roberto</div><div class="sb-urole">professor · cibersegurança</div></div>
+        <div class="sb-dot"></div>
+      </div>
+      <nav class="sb-nav">
+        <div class="sb-sec">Principal</div>
+        <div class="sb-item on" onclick="prView('dashboard')"><div class="sb-ic">📊</div>Dashboard</div>
+        <div class="sb-item" onclick="prView('turmas')"><div class="sb-ic">👥</div>Turmas<span class="sb-num">2</span></div>
+        <div class="sb-item" onclick="prView('alunos')"><div class="sb-ic">🎓</div>Alunos</div>
+        <div class="sb-item" onclick="prView('conteudo')"><div class="sb-ic">📖</div>Conteúdo</div>
+        <div class="sb-sec">Ferramentas</div>
+        <div class="sb-item" onclick="prView('avaliacoes')"><div class="sb-ic">📋</div>Avaliações</div>
+        <div class="sb-item" onclick="prView('chamados')"><div class="sb-ic">🎫</div>Chamados<span class="sb-num sb-num-r">3</span></div>
+        <div class="sb-item" onclick="prView('base')"><div class="sb-ic">🧠</div>Base de Conhecimento</div>
+        <div class="sb-item" onclick="prView('relatorios')"><div class="sb-ic">📈</div>Relatórios</div>
+      </nav>
+      <div class="sb-foot"><button class="sb-logout" onclick="logout()">← Sair</button></div>
+    </aside>
+    <div class="pmain">
+      <div class="ptb"><div><div class="ptb-t" id="pr-ptb-t">Dashboard</div><div class="ptb-s">Portal do Professor</div></div><button class="btn btn-cy btn-sm" onclick="showModal('add-content')">+ Novo Conteúdo</button></div>
+      <div class="pcontent">
+        <div class="pv on" id="prv-dashboard">
+          <div class="ph"><h2>Olá, <span id="pr-first">Professor</span>! 👋</h2><p>Você tem <strong style="color:var(--cy)">47</strong> alunos ativos</p></div>
+          <div class="srow">
+            <div class="sc"><div class="sic sic-cy">🎓</div><div><div class="sv">47</div><div class="sl">Alunos Ativos</div></div></div>
+            <div class="sc"><div class="sic sic-bl">📚</div><div><div class="sv">3</div><div class="sl">Turmas Ativas</div></div></div>
+            <div class="sc"><div class="sic sic-gr">✅</div><div><div class="sv">89%</div><div class="sl">Taxa Conclusão</div></div></div>
+            <div class="sc"><div class="sic sic-am">⭐</div><div><div class="sv">4.8</div><div class="sl">Avaliação Média</div></div></div>
+          </div>
+          <div class="g2">
+            <div class="card"><div class="card-hd"><div class="card-hd-t">Turmas</div><button class="btn btn-ghost btn-sm" onclick="prView('turmas')">Ver tudo</button></div><div style="padding:0"><table><thead><tr><th>Turma</th><th>Alunos</th><th>Progresso</th></tr></thead><tbody id="pr-turmas-t"></tbody></table></div></div>
+            <div class="card"><div class="card-hd"><div class="card-hd-t">Chamados Abertos</div><span class="badge bg-rd">3</span></div><div style="padding:0"><table><thead><tr><th>Aluno</th><th>Assunto</th><th>Ação</th></tr></thead><tbody id="pr-cham-t"></tbody></table></div></div>
+          </div>
+          <div class="card"><div class="card-hd"><div class="card-hd-t">Atividade dos Alunos</div><button class="btn btn-ghost btn-sm" onclick="prView('alunos')">Ver todos</button></div><div style="padding:0"><table><thead><tr><th>Aluno</th><th>Turma</th><th>Progresso</th><th>Última Atividade</th><th>Status</th></tr></thead><tbody id="pr-alunos-t"></tbody></table></div></div>
+        </div>
+        <div class="pv" id="prv-turmas"><div class="ph"><h2>Minhas Turmas</h2></div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px" id="pr-turmas-cards"></div></div>
+        <div class="pv" id="prv-alunos">
+          <div class="ph"><h2>Alunos</h2></div>
+          <div style="display:flex;gap:9px;margin-bottom:12px;flex-wrap:wrap">
+            <input class="fi" placeholder="Filtrar por nome..." id="pr-filter" oninput="prFilterAlunos()" style="max-width:220px;padding:7px 11px;font-size:12.5px"/>
+            <select class="fs" id="pr-turma-filter" onchange="prFilterAlunos()" style="max-width:170px;padding:7px 11px;font-size:12.5px"><option value="">Todas as turmas</option><option value="blue_team">Blue Team</option><option value="red_team">Red Team</option><option value="forense">Forense</option></select>
+          </div>
+          <div class="tbl-wrap"><table><thead><tr><th>Aluno</th><th>E-mail</th><th>Turma</th><th>Progresso</th><th>Última Atividade</th><th>Ações</th></tr></thead><tbody id="pr-alunos-full"></tbody></table></div>
+        </div>
+        <div class="pv" id="prv-conteudo"><div class="ph"><h2>Conteúdo</h2></div><div style="margin-bottom:12px"><button class="btn btn-cy btn-sm" onclick="showModal('add-content')">+ Nova Aula</button></div><div class="tbl-wrap"><table><thead><tr><th>Título</th><th>Módulo</th><th>Tipo</th><th>Duração</th><th>Views</th><th>Ações</th></tr></thead><tbody id="pr-content-t"></tbody></table></div></div>
+        <div class="pv" id="prv-avaliacoes"><div class="ph"><h2>Avaliações</h2></div><div class="tbl-wrap"><table><thead><tr><th>Título</th><th>Turma</th><th>Prazo</th><th>Entregues</th><th>Média</th><th>Status</th></tr></thead><tbody id="pr-aval-t"></tbody></table></div></div>
+        <div class="pv" id="prv-chamados"><div class="ph"><h2>Chamados</h2></div><div class="tbl-wrap"><table><thead><tr><th>ID</th><th>Aluno</th><th>Assunto</th><th>Data</th><th>Status</th><th>Ação</th></tr></thead><tbody id="pr-cham-full"></tbody></table></div></div>
+        <div class="pv" id="prv-base">
+          <div class="ph"><h2>Base de Conhecimento</h2><p>Registre problemas e soluções para a IA aprender</p></div>
+          <div class="g2" style="align-items:start">
+            <div class="card"><div class="card-hd"><div class="card-hd-t">Registrar</div></div><div class="card-bd">
+              <div class="fg"><div class="fl">Problema</div><textarea class="fta" id="kb-prob" placeholder="Descreva o problema..."></textarea></div>
+              <div class="fg"><div class="fl">Solução</div><textarea class="fta" id="kb-sol" placeholder="Como foi resolvido..."></textarea></div>
+              <div class="fg"><div class="fl">Categoria</div><select class="fs" id="kb-cat"><option value="pentest">Pentest</option><option value="defesa">Defesa</option><option value="forense">Forense</option><option value="web">Web</option><option value="outro">Outro</option></select></div>
+              <button class="btn btn-cy btn-sm" onclick="prSaveKB()">Registrar na Base</button>
+            </div></div>
+            <div class="card"><div class="card-hd"><div class="card-hd-t">Registros Recentes</div></div><div style="padding:0"><table><thead><tr><th>Problema</th><th>Categoria</th><th>Status</th></tr></thead><tbody id="pr-kb-t"></tbody></table></div></div>
+          </div>
+        </div>
+        <div class="pv" id="prv-relatorios">
+          <div class="ph"><h2>Relatórios</h2></div>
+          <div class="srow">
+            <div class="sc"><div class="sic sic-cy">📊</div><div><div class="sv">92%</div><div class="sl">Engajamento</div></div></div>
+            <div class="sc"><div class="sic sic-bl">⏱</div><div><div class="sv">6.2h</div><div class="sl">Média/Aluno</div></div></div>
+            <div class="sc"><div class="sic sic-gr">🏆</div><div><div class="sv">18</div><div class="sl">Certificados</div></div></div>
+            <div class="sc"><div class="sic sic-am">📝</div><div><div class="sv">7.8</div><div class="sl">Nota Média</div></div></div>
+          </div>
+          <div class="tbl-wrap"><table><thead><tr><th>Aluno</th><th>Turma</th><th>Progresso</th><th>Nota</th><th>Tendência</th></tr></thead><tbody id="pr-rel-t"></tbody></table></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PORTAL ADMIN ═══ -->
