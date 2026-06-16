@@ -1,0 +1,2804 @@
+{
+  "name": "ECS — Sistema Completo v2",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "OPTIONS",
+        "path": "ecs-matricula",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "c1",
+      "name": "CORS Matrícula",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET,POST,OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type,Authorization,apikey"
+              }
+            ]
+          }
+        }
+      },
+      "id": "c1r",
+      "name": "CORS Resp Matrícula",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        240,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "OPTIONS",
+        "path": "ecs-painel",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "c2",
+      "name": "CORS Painel",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        -200
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET,POST,OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type,Authorization,apikey"
+              }
+            ]
+          }
+        }
+      },
+      "id": "c2r",
+      "name": "CORS Resp Painel",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        240,
+        -200
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ecs-matricula",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "w1",
+      "name": "WH Matrícula",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const b=$input.first().json.body||$input.first().json;\nconst p={mensal:129.90,trimestral:99.90,anual:79.90};\nlet v=p[b.plano]||129.90;if(b.desconto>0)v=v*(1-b.desconto/100);\nreturn [{json:{nome:b.nome||'',email:b.email||'',telefone:b.tel||b.telefone||'',cidade:b.cidade||'',estado:b.estado||'',nivel_exp:b.nivel||'iniciante',trilha:b.trilha,plano:b.plano,valor:Math.round(v*100)/100,desconto:b.desconto||0,cupom:b.cupom||null,id_local:b.id_local||('ECS-'+Date.now())}}];"
+      },
+      "id": "p1",
+      "name": "Parse Matrícula",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://vfxocmjcumjhrnahyoep.supabase.co/rest/v1/usuarios?on_conflict=email",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation,resolution=merge-duplicates"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({nome:$json.nome,email:$json.email,telefone:$json.telefone||\"\",cidade:$json.cidade||\"\",estado:$json.estado||\"\",nivel_exp:$json.nivel_exp||\"iniciante\",role:\"aluno\",ativo:true}) }}"
+      },
+      "id": "h1",
+      "name": "SB Upsert Usuário",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        480,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const u=$input.first().json,p=$('Parse Matrícula').first().json;\nconst a=Array.isArray(u)?u:[u];const uid=a[0]?a[0].id:null;\nreturn [{json:Object.assign({},p,{usuario_id:uid})}];"
+      },
+      "id": "g1",
+      "name": "Extrair ID Usuário",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://vfxocmjcumjhrnahyoep.supabase.co/rest/v1/matriculas",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({usuario_id:$json.usuario_id,trilha:$json.trilha,plano:$json.plano,status:\"pendente\",valor:$json.valor,desconto:$json.desconto,cupom:$json.cupom,id_local:$json.id_local}) }}"
+      },
+      "id": "h2",
+      "name": "SB Insert Matrícula",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        960,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({success:true,message:\"Matrícula salva!\",id_local:$(\"Extrair ID Usuário\").first().json.id_local}) }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET,POST,OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type,Authorization,apikey"
+              }
+            ]
+          }
+        }
+      },
+      "id": "r1",
+      "name": "Resp Matrícula",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ecs-matricula-aprovada",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "w2",
+      "name": "WH Aprovar",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const b=$input.first().json.body||$input.first().json;\nreturn [{json:{id_local:b.id_local||b.id,ts:b.ts||new Date().toISOString()}}];"
+      },
+      "id": "p2",
+      "name": "Parse Aprovação",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://vfxocmjcumjhrnahyoep.supabase.co/rest/v1/matriculas?id_local=eq.{{ $json.id_local }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({status:$json.status||\"aprovada\",aprovado_em:$json.ts}) }}",
+        "jsCode": null
+      },
+      "id": "h3",
+      "name": "SB Aprovar",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        480,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({success:true,message:\"Matrícula aprovada!\"}) }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET,POST,OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type,Authorization,apikey"
+              }
+            ]
+          }
+        }
+      },
+      "id": "r2",
+      "name": "Resp Aprovação",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        720,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ecs-aluno",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "w3",
+      "name": "WH Aluno",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://vfxocmjcumjhrnahyoep.supabase.co/rest/v1/usuarios?on_conflict=email",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation,resolution=merge-duplicates"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({nome:$json.body.nome||$json.nome,email:$json.body.email||$json.email,role:\"aluno\",ativo:true}) }}"
+      },
+      "id": "h4",
+      "name": "SB Insert Aluno",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        240,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({success:true,message:\"Aluno salvo!\"}) }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET,POST,OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type,Authorization,apikey"
+              }
+            ]
+          }
+        }
+      },
+      "id": "r3",
+      "name": "Resp Aluno",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        480,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ecs-progresso",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "w4",
+      "name": "WH Progresso",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        660
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const b=$input.first().json.body||$input.first().json;\nreturn [{json:{usuario_id:b.usuario_id||null,aula_id:b.aula_id||null,curso_id:b.curso_id||null,xp:b.xp||10,tempo_min:b.tempo_min||0}}];"
+      },
+      "id": "p4",
+      "name": "Parse Progresso",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        660
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://vfxocmjcumjhrnahyoep.supabase.co/rest/v1/progresso_aluno",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({usuario_id:$json.usuario_id,aula_id:$json.aula_id,curso_id:$json.curso_id,status:\"concluida\",xp_ganho:$json.xp,tempo_min:$json.tempo_min,concluido_em:new Date().toISOString()}) }}"
+      },
+      "id": "h5",
+      "name": "SB Insert Progresso",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        480,
+        660
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://vfxocmjcumjhrnahyoep.supabase.co/rest/v1/xp_historico",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({usuario_id:$json.usuario_id,xp:$json.xp||10,motivo:\"aula_concluida\"}) }}"
+      },
+      "id": "h6",
+      "name": "SB Insert XP",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        720,
+        660
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({success:true,message:\"Progresso salvo!\"}) }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET,POST,OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type,Authorization,apikey"
+              }
+            ]
+          }
+        }
+      },
+      "id": "r4",
+      "name": "Resp Progresso",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        960,
+        660
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ecs-certificado",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "w5",
+      "name": "WH Certificado",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        840
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const b=$input.first().json.body||$input.first().json;\nreturn [{json:{\n  hash: b.hash||('ECS-'+Date.now().toString(36).toUpperCase()),\n  valido: true,\n  nome_aluno: b.nome_aluno||'',\n  curso_nome: b.curso_nome||''\n}}];"
+      },
+      "id": "p5",
+      "name": "Parse Certificado",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        840
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://vfxocmjcumjhrnahyoep.supabase.co/rest/v1/logs_sistema",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({acao:\"certificado_emitido\",detalhes:{hash:$json.hash,nome_aluno:$json.nome_aluno||\"\",curso_nome:$json.curso_nome||\"\",valido:true}}) }}"
+      },
+      "id": "h7",
+      "name": "SB Insert Certificado",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        480,
+        840
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({success:true,message:\"Certificado registrado!\"}) }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET,POST,OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type,Authorization,apikey"
+              }
+            ]
+          }
+        }
+      },
+      "id": "r5",
+      "name": "Resp Certificado",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        720,
+        840
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ecs-chamado",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "w6",
+      "name": "WH Chamado",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        1020
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const b=$input.first().json.body||$input.first().json;\nreturn [{json:{action:b.action||'abrir',id:b.id||null,autor_id:b.autor_id||null,assunto:b.assunto||'',descricao:b.descricao||'',prioridade:b.prioridade||'media'}}];"
+      },
+      "id": "p6",
+      "name": "Parse Chamado",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        1020
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://vfxocmjcumjhrnahyoep.supabase.co/rest/v1/chamados",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({assunto:$json.assunto||\"Suporte\",descricao:$json.descricao||\"\",prioridade:[\"baixa\",\"media\",\"alta\",\"critica\"].includes($json.prioridade)?$json.prioridade:\"media\",status:\"aberto\"}) }}"
+      },
+      "id": "h8a",
+      "name": "SB Abrir Chamado",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        480,
+        960
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://vfxocmjcumjhrnahyoep.supabase.co/rest/v1/chamados?id=eq.{{ $json.id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({status:\"resolvido\",resolvido_em:new Date().toISOString()}) }}"
+      },
+      "id": "h8b",
+      "name": "SB Resolver Chamado",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        480,
+        1080
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({success:true,message:\"Chamado processado!\"}) }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET,POST,OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type,Authorization,apikey"
+              }
+            ]
+          }
+        }
+      },
+      "id": "r6",
+      "name": "Resp Chamado",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        720,
+        1020
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const b=$input.first().json;\nif(b.action==='resolver'){\n  return [{json:{_skip:true}},{json:b}];\n}\n// For 'abrir' - ensure valid enum values\nreturn [{json:{\n  autor_id: b.autor_id||null,\n  assunto: b.assunto||'Suporte',\n  descricao: b.descricao||'',\n  prioridade: ['baixa','media','alta','critica'].indexOf(b.prioridade)>=0 ? b.prioridade : 'media',\n  status: 'aberto'\n}},{json:{_skip:true}}];"
+      },
+      "id": "sw6",
+      "name": "Rota Chamado",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        360,
+        1020
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ecs-aprender",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "w7",
+      "name": "WH KB",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        1200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://vfxocmjcumjhrnahyoep.supabase.co/rest/v1/base_conhecimento",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({problema:$json.body.problema||$json.problema,solucao:$json.body.solucao||$json.solucao,categoria:$json.body.categoria||$json.categoria||\"outro\",aprovado:false}) }}"
+      },
+      "id": "h9",
+      "name": "SB Insert KB",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        240,
+        1200
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({success:true,message:\"Conhecimento registrado!\"}) }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET,POST,OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type,Authorization,apikey"
+              }
+            ]
+          }
+        }
+      },
+      "id": "r7",
+      "name": "Resp KB",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        480,
+        1200
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ecs-turma",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "w8",
+      "name": "WH Turma",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        1380
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const b=$input.first().json.body||$input.first().json;\nreturn [{json:{nome:b.nome,trilha:b.trilha||'blue_team',professor_id:b.professor_id||null,descricao:b.descricao||'',max_alunos:b.max_alunos||30,data_inicio:b.data_inicio||null}}];"
+      },
+      "id": "p8",
+      "name": "Parse Turma",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        1380
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://vfxocmjcumjhrnahyoep.supabase.co/rest/v1/turmas",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({nome:$json.nome,trilha:$json.trilha,professor_id:$json.professor_id,descricao:$json.descricao,max_alunos:$json.max_alunos,data_inicio:$json.data_inicio,ativa:true}) }}"
+      },
+      "id": "h10",
+      "name": "SB Insert Turma",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        480,
+        1380
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({success:true,message:\"Turma criada!\"}) }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET,POST,OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type,Authorization,apikey"
+              }
+            ]
+          }
+        }
+      },
+      "id": "r8",
+      "name": "Resp Turma",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        720,
+        1380
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ecs-aula",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "w9",
+      "name": "WH Aula",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        1540
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const b=$input.first().json.body||$input.first().json;\nreturn [{json:{curso_id:b.curso_id||null,modulo_id:b.modulo_id||null,titulo:b.titulo||'',descricao:b.descricao||'',tipo:b.tipo||'video',url:b.url||'',duracao_min:b.duracao_min||0,xp_recompensa:b.xp||10,ordem:b.ordem||1}}];"
+      },
+      "id": "p9",
+      "name": "Parse Aula",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        1540
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://vfxocmjcumjhrnahyoep.supabase.co/rest/v1/aulas",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({curso_id:$json.curso_id,modulo_id:$json.modulo_id,titulo:$json.titulo,descricao:$json.descricao,tipo:$json.tipo,url:$json.url,duracao_min:$json.duracao_min,xp_recompensa:$json.xp_recompensa,ordem:$json.ordem,publicada:false}) }}"
+      },
+      "id": "h11",
+      "name": "SB Insert Aula",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        480,
+        1540
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({success:true,message:\"Aula criada!\"}) }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET,POST,OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type,Authorization,apikey"
+              }
+            ]
+          }
+        }
+      },
+      "id": "r9",
+      "name": "Resp Aula",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        720,
+        1540
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ecs-avaliacao",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "w10",
+      "name": "WH Avaliação",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        1700
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const b=$input.first().json.body||$input.first().json;\nreturn [{json:{action:b.action||'criar',avaliacao_id:b.avaliacao_id||null,usuario_id:b.usuario_id||null,turma_id:b.turma_id||null,professor_id:b.professor_id||null,titulo:b.titulo||'',prazo:b.prazo||null,nota:b.nota||null,feedback:b.feedback||''}}];"
+      },
+      "id": "p10",
+      "name": "Parse Avaliação",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        1700
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://vfxocmjcumjhrnahyoep.supabase.co/rest/v1/avaliacoes",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({titulo:$json.titulo,turma_id:$json.turma_id,professor_id:$json.professor_id,prazo:$json.prazo,status:\"aberta\"}) }}"
+      },
+      "id": "h12a",
+      "name": "SB Insert Avaliação",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        480,
+        1640
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://vfxocmjcumjhrnahyoep.supabase.co/rest/v1/notas",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({avaliacao_id:$json.avaliacao_id,usuario_id:$json.usuario_id,nota:$json.nota,feedback:$json.feedback,entregue_em:new Date().toISOString()}) }}"
+      },
+      "id": "h12b",
+      "name": "SB Insert Nota",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        480,
+        1760
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({success:true,message:\"Avaliação processada!\"}) }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET,POST,OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type,Authorization,apikey"
+              }
+            ]
+          }
+        }
+      },
+      "id": "r10",
+      "name": "Resp Avaliação",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        720,
+        1700
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const b=$input.first().json;\nif(b.action==='nota') return [{json:{_skip:true}},{json:b}];\nreturn [{json:b},{json:{_skip:true}}];"
+      },
+      "id": "sw10",
+      "name": "Rota Avaliação",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        360,
+        1700
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ecs-financeiro",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "w11",
+      "name": "WH Financeiro",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        1900
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const b=$input.first().json.body||$input.first().json;\nreturn [{json:{usuario_id:b.usuario_id||null,matricula_id:b.matricula_id||null,descricao:b.descricao||'Mensalidade',valor:b.valor||129.90,tipo:b.tipo||'mensalidade',status:b.status||'pendente',vencimento:b.vencimento||null}}];"
+      },
+      "id": "p11",
+      "name": "Parse Financeiro",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        1900
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://vfxocmjcumjhrnahyoep.supabase.co/rest/v1/financeiro",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({usuario_id:$json.usuario_id,matricula_id:$json.matricula_id,descricao:$json.descricao,valor:$json.valor,tipo:$json.tipo,status:$json.status,vencimento:$json.vencimento}) }}"
+      },
+      "id": "h13",
+      "name": "SB Insert Financeiro",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        480,
+        1900
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({success:true,message:\"Financeiro registrado!\"}) }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET,POST,OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type,Authorization,apikey"
+              }
+            ]
+          }
+        }
+      },
+      "id": "r11",
+      "name": "Resp Financeiro",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        720,
+        1900
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ecs-mensagem",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "w12",
+      "name": "WH Mensagem",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        2060
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://vfxocmjcumjhrnahyoep.supabase.co/rest/v1/mensagens_chamado",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({chamado_id:$json.body.chamado_id||$json.chamado_id,autor_id:$json.body.autor_id||$json.autor_id||null,mensagem:$json.body.mensagem||$json.mensagem}) }}"
+      },
+      "id": "h14",
+      "name": "SB Insert Mensagem",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        240,
+        2060
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({success:true,message:\"Mensagem enviada!\"}) }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET,POST,OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type,Authorization,apikey"
+              }
+            ]
+          }
+        }
+      },
+      "id": "r12",
+      "name": "Resp Mensagem",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        480,
+        2060
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "ecs-painel",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "w13",
+      "name": "WH GET Painel",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        2260
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const q=$input.first().json.query||{};\nreturn [{json:{tipo:(q.tipo||'matriculas').toLowerCase()}}];"
+      },
+      "id": "d13",
+      "name": "Detectar Tipo",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        2260
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.tipo }}",
+                    "rightValue": "matriculas",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "matriculas"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.tipo }}",
+                    "rightValue": "alunos",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "alunos"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.tipo }}",
+                    "rightValue": "professores",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "professores"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.tipo }}",
+                    "rightValue": "chamados",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "chamados"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.tipo }}",
+                    "rightValue": "logs",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "logs"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.tipo }}",
+                    "rightValue": "financeiro",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "financeiro"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.tipo }}",
+                    "rightValue": "kb",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "kb"
+            }
+          ]
+        },
+        "fallbackOutput": "extra"
+      },
+      "id": "sw13",
+      "name": "Switch Painel",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        480,
+        2260
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET,POST,OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type,Authorization,apikey"
+              }
+            ]
+          }
+        }
+      },
+      "id": "rpan",
+      "name": "Resp Painel CORS",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        2600
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://vfxocmjcumjhrnahyoep.supabase.co/rest/v1/matriculas?select=*,usuarios(nome,email,telefone,cidade,estado)&order=created_at.desc&limit=200",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            }
+          ]
+        }
+      },
+      "id": "g0",
+      "name": "GET Matriculas",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        720,
+        2340
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const r=Array.isArray($input.first().json)?$input.first().json:[$input.first().json];\nconst d=r.map(m=>({id:m.id_local||m.id,id_supabase:m.id,aluno:m.usuarios?m.usuarios.nome:'—',nome:m.usuarios?m.usuarios.nome:'—',email:m.usuarios?m.usuarios.email:'—',telefone:m.usuarios?m.usuarios.telefone:'—',trilha:m.trilha,plano:m.plano,valor:m.valor,desconto:m.desconto||0,cupom:m.cupom||'',status:m.status,data:(m.created_at||'').slice(0,10),created_at:m.created_at}));\nreturn [{json:{success:true,tipo:'matriculas',total:d.length,data:d}}];"
+      },
+      "id": "f0",
+      "name": "Fmt Matriculas",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        2340
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://vfxocmjcumjhrnahyoep.supabase.co/rest/v1/usuarios?select=*&role=eq.aluno&order=created_at.desc&limit=200",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            }
+          ]
+        }
+      },
+      "id": "g1",
+      "name": "GET Alunos",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        720,
+        2480
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const r=Array.isArray($input.first().json)?$input.first().json:[$input.first().json];\nconst d=r.map(u=>({id:u.id,nome:u.nome,email:u.email,telefone:u.telefone||'',cidade:u.cidade||'',estado:u.estado||'',nivel:u.nivel_exp||'iniciante',turma:'blue_team',prog:0,status:u.ativo?'ativo':'inativo',last:u.ultimo_login?(u.ultimo_login||'').slice(0,16).replace('T',' '):'—',nota:0,created_at:u.created_at}));\nreturn [{json:{success:true,tipo:'alunos',total:d.length,data:d}}];"
+      },
+      "id": "f1",
+      "name": "Fmt Alunos",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        2480
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://vfxocmjcumjhrnahyoep.supabase.co/rest/v1/usuarios?select=*&role=eq.professor&order=nome.asc",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            }
+          ]
+        }
+      },
+      "id": "g2",
+      "name": "GET Professores",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        720,
+        2620
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const r=Array.isArray($input.first().json)?$input.first().json:[$input.first().json];\nconst d=r.map(u=>({id:u.id,nome:u.nome,email:u.email,disc:'Cibersegurança',turmas:0,alunos:0,nota:4.8,status:u.ativo?'ativo':'inativo'}));\nreturn [{json:{success:true,tipo:'professores',total:d.length,data:d}}];"
+      },
+      "id": "f2",
+      "name": "Fmt Professores",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        2620
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://vfxocmjcumjhrnahyoep.supabase.co/rest/v1/chamados?select=*,usuarios!autor_id(nome,email)&order=created_at.desc&limit=100",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            }
+          ]
+        }
+      },
+      "id": "g3",
+      "name": "GET Chamados",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        720,
+        2760
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const r=Array.isArray($input.first().json)?$input.first().json:[$input.first().json];\nconst d=r.map(c=>({id:c.id,id_chamado:'#'+c.id.slice(-4),aluno:c.usuarios?c.usuarios.nome:'—',email:c.usuarios?c.usuarios.email:'—',assunto:c.assunto,descricao:c.descricao||'',prio:c.prioridade||'media',status:c.status,data:(c.created_at||'').slice(0,10),created_at:c.created_at}));\nreturn [{json:{success:true,tipo:'chamados',total:d.length,data:d}}];"
+      },
+      "id": "f3",
+      "name": "Fmt Chamados",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        2760
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://vfxocmjcumjhrnahyoep.supabase.co/rest/v1/logs_sistema?select=*,usuarios(nome)&order=created_at.desc&limit=50",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            }
+          ]
+        }
+      },
+      "id": "g4",
+      "name": "GET Logs",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        720,
+        2900
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const r=Array.isArray($input.first().json)?$input.first().json:[$input.first().json];\nconst d=r.map(l=>({id:l.id,acao:l.acao,usuario_nome:l.usuarios?l.usuarios.nome:'—',detalhes:l.detalhes,created_at:l.created_at}));\nreturn [{json:{success:true,tipo:'logs',total:d.length,data:d}}];"
+      },
+      "id": "f4",
+      "name": "Fmt Logs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        2900
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://vfxocmjcumjhrnahyoep.supabase.co/rest/v1/financeiro?select=*,usuarios(nome,email)&order=created_at.desc&limit=100",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            }
+          ]
+        }
+      },
+      "id": "g5",
+      "name": "GET Financeiro",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        720,
+        3040
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const r=Array.isArray($input.first().json)?$input.first().json:[$input.first().json];\nconst d=r.map(f=>({id:f.id,aluno:f.usuarios?f.usuarios.nome:'—',email:f.usuarios?f.usuarios.email:'—',plano:f.descricao||'Mensalidade',valor:'R$'+(f.valor||0).toFixed(2).replace('.',','),venc:(f.vencimento||'').slice(0,10),status:f.status,created_at:f.created_at}));\nreturn [{json:{success:true,tipo:'financeiro',total:d.length,data:d}}];"
+      },
+      "id": "f5",
+      "name": "Fmt Financeiro",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        3040
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://vfxocmjcumjhrnahyoep.supabase.co/rest/v1/base_conhecimento?select=*&order=created_at.desc&limit=100",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeG9jbWpjdW1qaHJuYWh5b2VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTcyMTcsImV4cCI6MjA5NzA3MzIxN30.6l3x56XQF7Chruzikks5Ql6npzaM_ct3txxTXCFDq-k"
+            }
+          ]
+        }
+      },
+      "id": "g6",
+      "name": "GET Kb",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        720,
+        3180
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const r=Array.isArray($input.first().json)?$input.first().json:[$input.first().json];\nconst d=r.map(k=>({id:k.id,prob:k.problema,solucao:k.solucao,cat:k.categoria,status:k.aprovado?'resolvido':'em aberto',created_at:k.created_at}));\nreturn [{json:{success:true,tipo:'kb',total:d.length,data:d}}];"
+      },
+      "id": "f6",
+      "name": "Fmt Kb",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        3180
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{json:{success:false,total:0,data:[],erro:'Tipo invalido'}}];"
+      },
+      "id": "fb",
+      "name": "Fallback",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        3320
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const b=$input.first().json;\nif(b._skip) return [];\nreturn [{json:b}];"
+      },
+      "id": "filter-abrir",
+      "name": "Filter Abrir",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        -2064
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const b=$input.first().json;\nif(b._skip) return [];\nreturn [{json:b}];"
+      },
+      "id": "filter-resolver",
+      "name": "Filter Resolver",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        -1984
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const b=$input.first().json;\nif(b._skip) return [];\nreturn [{json:b}];"
+      },
+      "id": "filter-criar-aval",
+      "name": "Filter Criar Aval",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        -1376
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const b=$input.first().json;\nif(b._skip) return [];\nreturn [{json:b}];"
+      },
+      "id": "filter-nota",
+      "name": "Filter Nota",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        -1296
+      ]
+    }
+  ],
+  "connections": {
+    "CORS Matrícula": {
+      "main": [
+        [
+          {
+            "node": "CORS Resp Matrícula",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CORS Painel": {
+      "main": [
+        [
+          {
+            "node": "CORS Resp Painel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WH Matrícula": {
+      "main": [
+        [
+          {
+            "node": "Parse Matrícula",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Matrícula": {
+      "main": [
+        [
+          {
+            "node": "SB Upsert Usuário",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SB Upsert Usuário": {
+      "main": [
+        [
+          {
+            "node": "Extrair ID Usuário",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extrair ID Usuário": {
+      "main": [
+        [
+          {
+            "node": "SB Insert Matrícula",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SB Insert Matrícula": {
+      "main": [
+        [
+          {
+            "node": "Resp Matrícula",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WH Aprovar": {
+      "main": [
+        [
+          {
+            "node": "Parse Aprovação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Aprovação": {
+      "main": [
+        [
+          {
+            "node": "SB Aprovar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SB Aprovar": {
+      "main": [
+        [
+          {
+            "node": "Resp Aprovação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WH Aluno": {
+      "main": [
+        [
+          {
+            "node": "SB Insert Aluno",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SB Insert Aluno": {
+      "main": [
+        [
+          {
+            "node": "Resp Aluno",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WH Progresso": {
+      "main": [
+        [
+          {
+            "node": "Parse Progresso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Progresso": {
+      "main": [
+        [
+          {
+            "node": "SB Insert Progresso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SB Insert Progresso": {
+      "main": [
+        [
+          {
+            "node": "SB Insert XP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SB Insert XP": {
+      "main": [
+        [
+          {
+            "node": "Resp Progresso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WH Certificado": {
+      "main": [
+        [
+          {
+            "node": "Parse Certificado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Certificado": {
+      "main": [
+        [
+          {
+            "node": "SB Insert Certificado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SB Insert Certificado": {
+      "main": [
+        [
+          {
+            "node": "Resp Certificado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WH Chamado": {
+      "main": [
+        [
+          {
+            "node": "Parse Chamado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Chamado": {
+      "main": [
+        [
+          {
+            "node": "Rota Chamado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rota Chamado": {
+      "main": [
+        [
+          {
+            "node": "Filter Abrir",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Filter Resolver",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SB Abrir Chamado": {
+      "main": [
+        [
+          {
+            "node": "Resp Chamado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SB Resolver Chamado": {
+      "main": [
+        [
+          {
+            "node": "Resp Chamado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WH KB": {
+      "main": [
+        [
+          {
+            "node": "SB Insert KB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SB Insert KB": {
+      "main": [
+        [
+          {
+            "node": "Resp KB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WH Turma": {
+      "main": [
+        [
+          {
+            "node": "Parse Turma",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Turma": {
+      "main": [
+        [
+          {
+            "node": "SB Insert Turma",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SB Insert Turma": {
+      "main": [
+        [
+          {
+            "node": "Resp Turma",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WH Aula": {
+      "main": [
+        [
+          {
+            "node": "Parse Aula",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Aula": {
+      "main": [
+        [
+          {
+            "node": "SB Insert Aula",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SB Insert Aula": {
+      "main": [
+        [
+          {
+            "node": "Resp Aula",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WH Avaliação": {
+      "main": [
+        [
+          {
+            "node": "Parse Avaliação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Avaliação": {
+      "main": [
+        [
+          {
+            "node": "Rota Avaliação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rota Avaliação": {
+      "main": [
+        [
+          {
+            "node": "Filter Criar Aval",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Filter Nota",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SB Insert Avaliação": {
+      "main": [
+        [
+          {
+            "node": "Resp Avaliação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SB Insert Nota": {
+      "main": [
+        [
+          {
+            "node": "Resp Avaliação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WH Financeiro": {
+      "main": [
+        [
+          {
+            "node": "Parse Financeiro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Financeiro": {
+      "main": [
+        [
+          {
+            "node": "SB Insert Financeiro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SB Insert Financeiro": {
+      "main": [
+        [
+          {
+            "node": "Resp Financeiro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WH Mensagem": {
+      "main": [
+        [
+          {
+            "node": "SB Insert Mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SB Insert Mensagem": {
+      "main": [
+        [
+          {
+            "node": "Resp Mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WH GET Painel": {
+      "main": [
+        [
+          {
+            "node": "Detectar Tipo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detectar Tipo": {
+      "main": [
+        [
+          {
+            "node": "Switch Painel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch Painel": {
+      "main": [
+        [
+          {
+            "node": "GET Matriculas",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "GET Alunos",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "GET Professores",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "GET Chamados",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "GET Logs",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "GET Financeiro",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "GET Kb",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fallback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET Matriculas": {
+      "main": [
+        [
+          {
+            "node": "Fmt Matriculas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fmt Matriculas": {
+      "main": [
+        [
+          {
+            "node": "Resp Painel CORS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET Alunos": {
+      "main": [
+        [
+          {
+            "node": "Fmt Alunos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fmt Alunos": {
+      "main": [
+        [
+          {
+            "node": "Resp Painel CORS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET Professores": {
+      "main": [
+        [
+          {
+            "node": "Fmt Professores",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fmt Professores": {
+      "main": [
+        [
+          {
+            "node": "Resp Painel CORS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET Chamados": {
+      "main": [
+        [
+          {
+            "node": "Fmt Chamados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fmt Chamados": {
+      "main": [
+        [
+          {
+            "node": "Resp Painel CORS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET Logs": {
+      "main": [
+        [
+          {
+            "node": "Fmt Logs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fmt Logs": {
+      "main": [
+        [
+          {
+            "node": "Resp Painel CORS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET Financeiro": {
+      "main": [
+        [
+          {
+            "node": "Fmt Financeiro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fmt Financeiro": {
+      "main": [
+        [
+          {
+            "node": "Resp Painel CORS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET Kb": {
+      "main": [
+        [
+          {
+            "node": "Fmt Kb",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fmt Kb": {
+      "main": [
+        [
+          {
+            "node": "Resp Painel CORS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fallback": {
+      "main": [
+        [
+          {
+            "node": "Resp Painel CORS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Abrir": {
+      "main": [
+        [
+          {
+            "node": "SB Abrir Chamado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Resolver": {
+      "main": [
+        [
+          {
+            "node": "SB Resolver Chamado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Criar Aval": {
+      "main": [
+        [
+          {
+            "node": "SB Insert Avaliação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Nota": {
+      "main": [
+        [
+          {
+            "node": "SB Insert Nota",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true
+  },
+  "tags": [],
+  "pinData": {}
+}

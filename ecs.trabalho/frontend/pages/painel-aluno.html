@@ -1,0 +1,92 @@
+<!-- ECS — Página: PAINEL-ALUNO -->
+
+<div id="p-painel-aluno" class="page portal">
+  <div class="portal-shell">
+    <aside class="sb">
+      <div class="sb-top"><div class="sb-logo"><div class="sb-lbox" style="background:linear-gradient(135deg,var(--cy),var(--bl))">🛡</div><div><div class="sb-brand">ECS</div><div class="sb-role sbr-al">ALUNO</div></div></div></div>
+      <div class="sb-user">
+        <div class="sb-av" id="al-av" style="background:linear-gradient(135deg,var(--cy),var(--bl));color:#07090f">JS</div>
+        <div style="flex:1;min-width:0"><div class="sb-uname" id="al-name">João da Silva</div><div class="sb-urole" id="al-role">aluno · blue_team</div></div>
+        <div class="sb-dot"></div>
+      </div>
+      <nav class="sb-nav">
+        <div class="sb-sec">Principal</div>
+        <div class="sb-item on" onclick="alView('dashboard')"><div class="sb-ic">📊</div>Dashboard</div>
+        <div class="sb-item" onclick="alView('cursos')"><div class="sb-ic">🎓</div>Meus Cursos<span class="sb-num">3</span></div>
+        <div class="sb-item" onclick="alView('mentor')"><div class="sb-ic">🤖</div>Mentor IA</div>
+        <div class="sb-sec">Área do Aluno</div>
+        <div class="sb-item" onclick="alView('progresso')"><div class="sb-ic">📈</div>Progresso</div>
+        <div class="sb-item" onclick="alView('certificados')"><div class="sb-ic">🏆</div>Certificados</div>
+        <div class="sb-item" onclick="alView('suporte')"><div class="sb-ic">💬</div>Suporte<span class="sb-num sb-num-r">1</span></div>
+        <div class="sb-sec">Acesso</div>
+        <div class="sb-item" onclick="go('matricula')"><div class="sb-ic">📝</div>Nova Matrícula</div>
+      </nav>
+      <div class="sb-foot"><button class="sb-logout" onclick="logout()">← Sair da conta</button></div>
+    </aside>
+    <div class="pmain">
+      <div class="ptb">
+        <div><div class="ptb-t" id="al-ptb-t">Dashboard</div><div class="ptb-s">Bem-vindo de volta 👋</div></div>
+        <div class="ptb-search"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input placeholder="Buscar..."/></div>
+        <div style="width:32px;height:32px;background:var(--s2);border:1px solid var(--b1);border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;position:relative">🔔<div style="position:absolute;top:5px;right:5px;width:6px;height:6px;background:var(--rd);border-radius:50%;border:1.5px solid var(--bg)"></div></div>
+        <button class="btn btn-cy btn-sm" onclick="go('matricula')">+ Matrícula</button>
+      </div>
+      <div class="pcontent">
+        <div class="pv on" id="alv-dashboard">
+          <div class="ph"><h2>Olá, <span id="al-first">João</span>! 👋</h2><p>Seu resumo de hoje</p></div>
+          <div class="srow">
+            <div class="sc"><div class="sic sic-cy">📚</div><div><div class="sv">3</div><div class="sl">Cursos Ativos</div><div class="sdelta up">↑ 1 novo</div></div></div>
+            <div class="sc"><div class="sic sic-bl">⏱</div><div><div class="sv">48h</div><div class="sl">Horas Estudadas</div><div class="sdelta up">↑ 8h semana</div></div></div>
+            <div class="sc"><div class="sic sic-gr">✅</div><div><div class="sv">24</div><div class="sl">Aulas Concluídas</div><div class="sdelta up">↑ 4 semana</div></div></div>
+            <div class="sc"><div class="sic sic-am">⭐</div><div><div class="sv">1.240</div><div class="sl">XP Acumulado</div><div class="sdelta up">↑ 320 hoje</div></div></div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><div style="font-size:14px;font-weight:700">Continuar Aprendendo</div><button class="btn btn-ghost btn-sm" onclick="alView('cursos')">Ver todos →</button></div>
+          <div class="cg" id="al-courses"></div>
+          <div style="margin:20px 0 12px;font-size:14px;font-weight:700">Atividade Recente</div>
+          <div class="card"><div id="al-activity"></div></div>
+        </div>
+        <div class="pv" id="alv-cursos"><div class="ph"><h2>Meus Cursos</h2><p>Gerencie seu aprendizado</p></div><div class="cg" id="al-courses-full"></div></div>
+        <div class="pv" id="alv-mentor">
+          <div class="ph"><h2>Mentor IA</h2><p>Assistente de cibersegurança integrado</p></div>
+          <div style="background:var(--s2);border:1px solid var(--b1);border-radius:12px;overflow:hidden;height:calc(100vh - 190px);display:flex;flex-direction:column">
+            <div id="al-chat-msgs" style="flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;scrollbar-width:thin">
+              <div style="align-self:flex-start;background:var(--s3);border:1px solid var(--b1);border-radius:11px;padding:10px 13px;font-size:13px;color:var(--t2)">🤖 Olá! Pergunte sobre Blue Team, Red Team, SIEM, pentest e mais!</div>
+            </div>
+            <div style="padding:10px 12px;border-top:1px solid var(--b1);display:flex;gap:8px">
+              <input type="text" class="fi" id="al-ci" placeholder="Pergunte sobre cibersegurança..." onkeydown="if(event.key==='Enter')alChat()" style="flex:1;padding:8px 12px;font-size:13px"/>
+              <button class="btn btn-cy btn-sm" onclick="alChat()">Enviar →</button>
+            </div>
+          </div>
+        </div>
+        <div class="pv" id="alv-progresso">
+          <div class="ph"><h2>Meu Progresso</h2><p>Acompanhe sua evolução</p></div>
+          <div class="tbl-wrap"><table><thead><tr><th>Curso</th><th>Categoria</th><th>Aulas</th><th>Progresso</th><th>XP</th><th>Status</th></tr></thead><tbody id="al-prog-table"></tbody></table></div>
+        </div>
+        <div class="pv" id="alv-certificados"><div class="ph"><h2>Certificados</h2><p>Suas conquistas</p></div><div class="cg" id="al-certs"></div></div>
+        <div class="pv" id="alv-suporte">
+          <div class="ph"><h2>Suporte</h2><p>Fale com nossa equipe</p></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:780px">
+            <div class="card"><div class="card-hd"><div class="card-hd-t">Abrir Chamado</div></div><div class="card-bd">
+              <div class="fg"><div class="fl">Assunto</div><select class="fs"><option>Problema com acesso</option><option>Dúvida sobre conteúdo</option><option>Erro na plataforma</option><option>Outro</option></select></div>
+              <div class="fg"><div class="fl">Descrição</div><textarea class="fta" placeholder="Descreva seu problema..."></textarea></div>
+              <button class="btn btn-cy btn-sm" onclick="alEnviarChamado()">Enviar Chamado</button>
+            </div></div>
+            <div class="card" style="display:flex;flex-direction:column">
+              <div class="card-hd"><div class="card-hd-t">Chat Rápido</div></div>
+              <div style="flex:1;display:flex;flex-direction:column;min-height:280px">
+                <div id="al-sup-msgs" style="flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px">
+                  <div style="align-self:flex-start;background:var(--s3);border:1px solid var(--b1);border-radius:9px;padding:8px 12px;font-size:12.5px;color:var(--t2)">Olá! Como posso ajudar? 🛡</div>
+                </div>
+                <div style="padding:10px;border-top:1px solid var(--b1);display:flex;gap:7px">
+                  <input type="text" class="fi" id="al-sup-inp" placeholder="Mensagem..." onkeydown="if(event.key==='Enter')alSupSend()" style="flex:1;padding:7px 11px;font-size:12.5px"/>
+                  <button class="btn btn-cy btn-sm" onclick="alSupSend()">→</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PORTAL PROFESSOR ═══ -->

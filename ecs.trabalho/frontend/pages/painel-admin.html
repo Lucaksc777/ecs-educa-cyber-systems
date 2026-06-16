@@ -1,0 +1,101 @@
+<!-- ECS — Página: PAINEL-ADMIN -->
+
+<div id="p-painel-admin" class="page portal">
+  <div class="portal-shell">
+    <aside class="sb">
+      <div class="sb-top"><div class="sb-logo"><div class="sb-lbox" style="background:linear-gradient(135deg,var(--rd),var(--rd2))">🛡</div><div><div class="sb-brand">ECS</div><div class="sb-role sbr-ad">ADMIN</div></div></div></div>
+      <div class="sb-user">
+        <div class="sb-av" id="adm-av" style="background:linear-gradient(135deg,var(--rd),var(--rd2));color:#fff">AD</div>
+        <div style="flex:1;min-width:0"><div class="sb-uname" id="adm-name">Admin ECS</div><div class="sb-urole">administrador · root</div></div>
+        <div class="sb-dot"></div>
+      </div>
+      <nav class="sb-nav">
+        <div class="sb-sec">Gestão</div>
+        <div class="sb-item on" onclick="admView('dashboard')"><div class="sb-ic">📊</div>Dashboard</div>
+        <div class="sb-item" onclick="admView('alunos')"><div class="sb-ic">🎓</div>Alunos<span class="sb-num">47</span></div>
+        <div class="sb-item" onclick="admView('professores')"><div class="sb-ic">👨‍🏫</div>Professores</div>
+        <div class="sb-item" onclick="admView('matriculas')"><div class="sb-ic">📝</div>Matrículas<span class="sb-num sb-num-g">5</span></div>
+        <div class="sb-item" onclick="admView('turmas')"><div class="sb-ic">👥</div>Turmas</div>
+        <div class="sb-sec">Sistema</div>
+        <div class="sb-item" onclick="admView('financeiro')"><div class="sb-ic">💰</div>Financeiro</div>
+        <div class="sb-item" onclick="admView('chamados')"><div class="sb-ic">🎫</div>Chamados<span class="sb-num sb-num-r">3</span></div>
+        <div class="sb-item" onclick="admView('config')"><div class="sb-ic">⚙️</div>Configurações</div>
+        <div class="sb-item" onclick="admView('logs')"><div class="sb-ic">📋</div>Logs</div>
+      </nav>
+      <div class="sb-foot"><button class="sb-logout" onclick="logout()">← Sair do sistema</button></div>
+    </aside>
+    <div class="pmain">
+      <div class="ptb"><div><div class="ptb-t" id="adm-ptb-t">Dashboard Administrativo</div><div class="ptb-s">Gestão completa do ECS</div></div><button class="btn btn-cy btn-sm" onclick="showModal('add-aluno')">+ Novo Aluno</button></div>
+      <div class="pcontent">
+        <div class="pv on" id="admv-dashboard">
+          <div class="ph"><h2>Painel Administrativo</h2><p>Gestão completa da plataforma ECS</p></div>
+          <div class="srow">
+            <div class="sc"><div class="sic sic-bl">🎓</div><div><div class="sv">47</div><div class="sl">Alunos Ativos</div><div class="sdelta up">↑ 12 esse mês</div></div></div>
+            <div class="sc"><div class="sic sic-pu">👨‍🏫</div><div><div class="sv">6</div><div class="sl">Professores</div></div></div>
+            <div class="sc"><div class="sic sic-gr">✅</div><div><div class="sv">89%</div><div class="sl">Taxa Conclusão</div><div class="sdelta up">↑ 5%</div></div></div>
+            <div class="sc"><div class="sic sic-am">💰</div><div><div class="sv">R$18k</div><div class="sl">Receita Mensal</div><div class="sdelta up">↑ 22%</div></div></div>
+          </div>
+          <div class="g2">
+            <div class="card"><div class="card-hd"><div class="card-hd-t">Matrículas Recentes</div><button class="btn btn-ghost btn-sm" onclick="admView('matriculas')">Ver todas</button></div><div style="padding:0"><table><thead><tr><th>Aluno</th><th>Trilha</th><th>Status</th><th>Ação</th></tr></thead><tbody id="adm-mat-t"></tbody></table></div></div>
+            <div class="card"><div class="card-hd"><div class="card-hd-t">Atividade do Sistema</div></div><div id="adm-activity"></div></div>
+          </div>
+          <div class="card"><div class="card-hd"><div class="card-hd-t">Alunos por Turma</div></div><div style="padding:0"><table><thead><tr><th>Turma</th><th>Professor</th><th>Alunos</th><th>Progresso</th><th>Status</th></tr></thead><tbody id="adm-turmas-t"></tbody></table></div></div>
+        </div>
+        <div class="pv" id="admv-alunos">
+          <div class="ph"><h2>Gestão de Alunos</h2></div>
+          <div style="display:flex;gap:9px;margin-bottom:12px;flex-wrap:wrap">
+            <input class="fi" placeholder="Buscar..." id="adm-search" oninput="admFilterAlunos()" style="max-width:200px;padding:7px 11px;font-size:12.5px"/>
+            <select class="fs" id="adm-st-filter" onchange="admFilterAlunos()" style="max-width:150px;padding:7px 11px;font-size:12.5px"><option value="">Todos</option><option value="ativo">Ativo</option><option value="inativo">Inativo</option></select>
+            <button class="btn btn-cy btn-sm" onclick="showModal('add-aluno')">+ Novo</button>
+            <button class="btn btn-ghost btn-sm" onclick="exportCSV()">⬇ CSV</button>
+          </div>
+          <div class="tbl-wrap"><table><thead><tr><th>Nome</th><th>E-mail</th><th>Turma</th><th>Progresso</th><th>Status</th><th>Ações</th></tr></thead><tbody id="adm-alunos-t"></tbody></table></div>
+        </div>
+        <div class="pv" id="admv-professores"><div class="ph"><h2>Professores</h2></div><div style="margin-bottom:12px"><button class="btn btn-cy btn-sm" onclick="showModal('add-prof')">+ Novo Professor</button></div><div class="tbl-wrap"><table><thead><tr><th>Nome</th><th>Disciplina</th><th>Turmas</th><th>Alunos</th><th>Avaliação</th><th>Ações</th></tr></thead><tbody id="adm-profs-t"></tbody></table></div></div>
+        <div class="pv" id="admv-matriculas">
+          <div class="ph"><h2>Matrículas</h2></div>
+          <div class="srow" style="grid-template-columns:repeat(3,1fr)">
+            <div class="sc"><div class="sic sic-gr">✅</div><div><div class="sv" id="mat-aprov">0</div><div class="sl">Aprovadas</div></div></div>
+            <div class="sc"><div class="sic sic-am">⏳</div><div><div class="sv" id="mat-pend">0</div><div class="sl">Pendentes</div></div></div>
+            <div class="sc"><div class="sic sic-rd">❌</div><div><div class="sv" id="mat-canc">0</div><div class="sl">Canceladas</div></div></div>
+          </div>
+          <div class="tbl-wrap"><table><thead><tr><th>Aluno</th><th>Trilha</th><th>Plano</th><th>Valor</th><th>Data</th><th>Status</th><th>Ações</th></tr></thead><tbody id="adm-mat-full"></tbody></table></div>
+        </div>
+        <div class="pv" id="admv-turmas"><div class="ph"><h2>Turmas</h2></div><div style="margin-bottom:12px"><button class="btn btn-cy btn-sm" onclick="showModal('add-turma')">+ Nova Turma</button></div><div class="tbl-wrap"><table><thead><tr><th>Turma</th><th>Professor</th><th>Trilha</th><th>Alunos</th><th>Início</th><th>Status</th><th>Ações</th></tr></thead><tbody id="adm-turmas-full"></tbody></table></div></div>
+        <div class="pv" id="admv-financeiro">
+          <div class="ph"><h2>Financeiro</h2></div>
+          <div class="srow">
+            <div class="sc"><div class="sic sic-gr">💰</div><div><div class="sv">R$18.4k</div><div class="sl">Receita Mensal</div></div></div>
+            <div class="sc"><div class="sic sic-bl">📈</div><div><div class="sv">R$198k</div><div class="sl">Receita Anual</div></div></div>
+            <div class="sc"><div class="sic sic-am">🔄</div><div><div class="sv">38</div><div class="sl">Assinaturas</div></div></div>
+            <div class="sc"><div class="sic sic-rd">⚠️</div><div><div class="sv">3</div><div class="sl">Em Atraso</div></div></div>
+          </div>
+          <div class="tbl-wrap"><table><thead><tr><th>Aluno</th><th>Plano</th><th>Valor</th><th>Vencimento</th><th>Status</th><th>Ação</th></tr></thead><tbody id="adm-fin-t"></tbody></table></div>
+        </div>
+        <div class="pv" id="admv-chamados"><div class="ph"><h2>Chamados</h2></div><div class="tbl-wrap"><table><thead><tr><th>ID</th><th>Aluno</th><th>Assunto</th><th>Prioridade</th><th>Data</th><th>Status</th><th>Ação</th></tr></thead><tbody id="adm-cham-t"></tbody></table></div></div>
+        <div class="pv" id="admv-config">
+          <div class="ph"><h2>Configurações</h2></div>
+          <div style="max-width:540px;display:flex;flex-direction:column;gap:14px">
+            <div class="card"><div class="card-hd"><div class="card-hd-t">🔗 N8N Webhooks</div></div><div class="card-bd"><div class="fg"><div class="fl">URL do N8N</div><input type="url" class="fi" id="cfg-n8n" value="http://177.8.224.178:5678" oninput="N8N=this.value"/></div>
+              <div style="background:rgba(0,229,212,.04);border:1px solid rgba(0,229,212,.1);border-radius:8px;padding:10px 12px;font-size:11px;color:var(--t2);font-family:var(--mono);margin-bottom:12px">
+                Webhooks ativos:<br>
+                POST /webhook/ecs-matricula<br>
+                POST /webhook/ecs-matricula-aprovada<br>
+                POST /webhook/ecs-aluno<br>
+                POST /webhook/ecs-aprender<br>
+                POST /webhook/ecs-chamado<br>
+                POST /webhook/ecs-progresso<br>
+                GET  /webhook/ecs-dados?tipo=...
+              </div><button class="btn btn-cy btn-sm" onclick="saveConfig()">Salvar</button></div></div>
+            <div class="card"><div class="card-hd"><div class="card-hd-t">🗄️ Supabase</div></div><div class="card-bd">
+              <div class="fg"><div class="fl">URL do Projeto</div><input type="url" class="fi" id="cfg-sb-url" value="https://vfxocmjcumjhrnahyoep.supabase.co"/></div>
+              <div class="fg"><div class="fl">Anon Key</div><input type="password" class="fi" id="cfg-sb-key" placeholder="eyJ..."/></div>
+              <button class="btn btn-cy btn-sm" onclick="saveConfig()">Salvar</button>
+            </div></div>
+          </div>
+        </div>
+        <div class="pv" id="admv-logs"><div class="ph"><h2>Logs do Sistema</h2></div><div class="card"><div id="adm-logs"></div></div></div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,59 @@
+<!-- ECS — Página: MENTOR-IA -->
+
+<div id="p-mentor-ia" class="page portal">
+  <div class="mentor-shell">
+    <div class="mentor-topbar">
+      <div style="display:flex;align-items:center;gap:9px;cursor:pointer" onclick="go('home')">
+        <div class="nlbox" style="width:28px;height:28px;font-size:13px">🛡</div>
+        <div style="font-family:var(--mono);font-size:12px;color:var(--cy);font-weight:600">ECS</div>
+      </div>
+      <div style="flex:1;display:flex;align-items:center;justify-content:center;gap:9px">
+        <div style="width:8px;height:8px;border-radius:50%;background:var(--gr);box-shadow:0 0 6px var(--gr)"></div>
+        <div><div style="font-size:13px;font-weight:600">CyberBot ECS</div><div style="font-size:9px;color:var(--t3);font-family:var(--mono)">KB Local · Cibersegurança · 24/7</div></div>
+      </div>
+      <div style="display:flex;gap:7px">
+        <button class="nbtn nb-g" style="padding:6px 12px;font-size:12px" onclick="go('matricula')">📝 Matrícula</button>
+        <button style="background:rgba(239,68,68,.1);color:var(--rd);border:1px solid rgba(239,68,68,.2);padding:6px 11px;border-radius:6px;font-size:12px;cursor:pointer;font-family:var(--font)" onclick="clearChat()">🗑 Limpar</button>
+      </div>
+    </div>
+    <div class="mn-layout">
+      <div class="mn-sl" id="mn-topics"></div>
+      <div class="chat-area">
+        <div class="chat-msgs" id="chat-msgs">
+          <div class="welcome" id="welcome-screen">
+            <div class="wi">🤖</div>
+            <h2 class="wh2">Olá! Sou o CyberBot ECS</h2>
+            <p class="wp">Especialista em cibersegurança. Pergunte sobre Blue Team, Red Team, SIEM, pentest, MITRE ATT&CK e muito mais.</p>
+            <div class="wchips" id="ws-chips"></div>
+          </div>
+        </div>
+        <div class="ci-area">
+          <div class="ci-row">
+            <textarea class="ci-ta" id="ci-input" placeholder="Pergunte sobre cibersegurança..." rows="1"
+              onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"
+              oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
+            <button class="ci-send" onclick="sendChat()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#07090f" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
+          <div class="ci-hint">Enter envia · Shift+Enter nova linha · KB local sem API</div>
+        </div>
+      </div>
+      <div class="mn-sr">
+        <div class="msr-t">// Sessão</div>
+        <div class="msr-c"><div class="msr-lbl">Modo</div><div class="msr-val" style="color:var(--cy)">🧠 KB Local</div><div class="msr-sub">Gemini com API Key</div></div>
+        <div class="msr-c"><div class="msr-lbl">Mensagens</div><div class="msr-val" id="msg-count">0</div></div>
+        <div class="msr-c"><div class="msr-lbl">Tópico</div><div class="msr-val" id="cur-topic" style="font-size:11px;color:var(--t2)">—</div></div>
+        <div class="msr-t" style="margin-top:12px">// Certificações</div>
+        <div class="cert-it" onclick="askChat('Como me preparar para o Security+?')">🏅 Security+</div>
+        <div class="cert-it" onclick="askChat('Como me preparar para o CEH?')">🎖 CEH</div>
+        <div class="cert-it" onclick="askChat('Como funciona o exame OSCP?')">🏆 OSCP</div>
+        <div class="cert-it" onclick="askChat('O que preciso saber para o BTL1?')">🛡 BTL1</div>
+        <div class="msr-t" style="margin-top:12px">// Base</div>
+        <div class="msr-c"><div class="msr-lbl">Tópicos</div><div class="msr-val" id="kb-size">17</div><div class="pb" style="margin-top:6px;width:100%;display:block"><div class="pf" style="width:100%"></div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MATRÍCULA ═══ -->

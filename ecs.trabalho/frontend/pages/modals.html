@@ -1,0 +1,55 @@
+<!-- ECS — Modais Globais (Login, Modal Genérico) -->
+<!-- LOADER -->
+<div id="loader"><div class="ld-s">🛡</div><div class="ld-t">// INICIANDO ECS...</div><div class="ld-b"><div class="ld-f"></div></div></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-logo" onclick="go('home')">
+    <div class="nlbox">🛡</div>
+    <div><div class="nlname">ECS</div><div class="nlsub">Educa Cyber Systems</div></div>
+  </div>
+  <div class="nav-links">
+    <button class="nav-link on" data-p="home" onclick="go('home')">Início</button>
+    <button class="nav-link" data-p="blue-team" onclick="go('blue-team')">🛡 Blue Team</button>
+    <button class="nav-link" data-p="red-team" onclick="go('red-team')">⚔️ Red Team</button>
+    <button class="nav-link" data-p="mentor-ia" onclick="go('mentor-ia')">🤖 Mentor IA</button>
+    <button class="nav-link" data-p="matricula" onclick="go('matricula')">📝 Matrícula</button>
+  </div>
+  <div class="nav-right">
+    <button class="nbtn nb-g" onclick="openLogin()">Portal →</button>
+    <button class="nbtn nb-c" onclick="go('matricula')">Matricular-se</button>
+  </div>
+</nav>
+
+<!-- LOGIN MODAL -->
+<div id="lm" onclick="if(event.target===this)closeLogin()">
+  <div class="lm-card">
+    <div class="lm-top">
+      <div><div class="lm-brand">🛡 ECS — PORTAL</div><div class="lm-sub">Educa Cyber Systems</div></div>
+      <button class="lm-x" onclick="closeLogin()">✕</button>
+    </div>
+    <div class="lm-tabs">
+      <div class="lm-tab on" onclick="setRole(this,'aluno')">🎓 Aluno</div>
+      <div class="lm-tab" onclick="setRole(this,'professor')">👨‍🏫 Professor</div>
+      <div class="lm-tab" onclick="setRole(this,'admin')">⚙️ Admin</div>
+    </div>
+    <div class="lm-body">
+      <input type="hidden" id="lm-role" value="aluno"/>
+      <div class="lm-field"><label class="lm-label">E-mail</label><input type="email" id="lm-email" class="lm-input" placeholder="aluno@ecs.com"/></div>
+      <div class="lm-field"><label class="lm-label">Senha</label><input type="password" id="lm-pass" class="lm-input" placeholder="••••••" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+      <div class="lm-err" id="lm-err"></div>
+      <button class="lm-submit" id="lm-btn" onclick="doLogin()">Entrar no Sistema</button>
+    </div>
+    <div class="lm-hint" id="lm-hint"><div class="lm-hint-ttl">💡 DEMO — ALUNO</div><b>aluno@ecs.com</b> / <b>123456</b></div>
+  </div>
+</div>
+
+<!-- MODAL GENÉRICO -->
+<div id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box">
+    <div class="modal-hd"><div class="modal-title" id="modal-title"></div><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<!-- ═══ HOME ═══ -->
